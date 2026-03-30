@@ -1,0 +1,89 @@
+﻿<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Weather App</h1>
+      <span class="badge">Open-Meteo</span>
+    </div>
+    <p class="sub">緯度・経度を入力して現在の天気を表示します。</p>
+
+    <div class="grid">
+      <div class="card">
+        <form method="POST">
+          <label for="preset">入力例（プリセット）</label>
+          <select id="preset" onchange="applyPreset(this.value)">
+            <option value="">選択すると緯度・経度が入ります</option>
+            <option value="35.681236,139.767125">東京 (35.681236, 139.767125)</option>
+            <option value="34.702485,135.495951">大阪 (34.702485, 135.495951)</option>
+            <option value="43.061936,141.354292">札幌 (43.061936, 141.354292)</option>
+            <option value="26.212401,127.680932">那覇 (26.212401, 127.680932)</option>
+          </select>
+
+          <div class="row">
+            <div>
+              <label for="lat">緯度（例：35.681236）</label>
+              <input id="lat" name="lat" type="text" placeholder="例）35.681236" value="{{ lat or '' }}">
+            </div>
+            <div>
+              <label for="lon">経度（例：139.767125）</label>
+              <input id="lon" name="lon" type="text" placeholder="例）139.767125" value="{{ lon or '' }}">
+            </div>
+          </div>
+
+          <button type="submit">天気を取得</button>
+
+          <div class="small">
+            入力の目安：日本付近なら緯度 20～46、経度 122～154 あたりが多いです（ざっくり）。<br>
+            小数点もOKです。
+          </div>
+        </form>
+
+        {% if error %}
+          <div class="error" style="margin-top:12px;">{{ error }}</div>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 10px;font-size:18px;">結果</h2>
+
+        {% if weather %}
+          <div class="kv">
+            <div class="k">地点</div>
+            <div class="v">lat={{ lat }}, lon={{ lon }}</div>
+          </div>
+          <div class="kv">
+            <div class="k">気温</div>
+            <div class="v">{{ weather.temperature }} ℃</div>
+          </div>
+          <div class="kv">
+            <div class="k">風速</div>
+            <div class="v">{{ weather.windspeed }} m/s</div>
+          </div>
+          <div class="kv">
+            <div class="k">時刻</div>
+            <div class="v">{{ weather.time }}</div>
+          </div>
+        {% else %}
+          <div class="small">まだ結果はありません。左のフォームから緯度・経度を入力して取得してください。</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function applyPreset(v){
+      if(!v) return;
+      const [lat, lon] = v.split(",");
+      document.getElementById("lat").value = lat;
+      document.getElementById("lon").value = lon;
+    }
+  </script>
+</body>
+</html>
